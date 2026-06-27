@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+backend/.venv/
+.pytest_cache/
+
+# Node / Nuxt
+node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/.data/
+frontend/dist/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
