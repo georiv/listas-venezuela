@@ -35,7 +35,7 @@
           <input
             ref="fileInput"
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic"
+            accept="image/jpeg,image/png,image/webp"
             multiple
             class="hidden"
             @change="onFileSelected"
@@ -53,8 +53,7 @@
               </button>
             </p>
             <p class="text-xs text-gray-400">
-              Puedes subir varias a la vez · JPG, PNG, WEBP o HEIC · máx. 10 MB
-              c/u
+              Puedes subir varias a la vez · JPG, PNG o WEBP · máx. 10 MB c/u
             </p>
           </div>
 
@@ -157,6 +156,17 @@
           >
             Subir otra imagen
           </button>
+        </div>
+
+        <!-- Per-image processing errors -->
+        <div
+          v-if="uploadWarnings.length > 0"
+          class="mb-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3"
+        >
+          <p class="font-medium">Algunas imágenes no se pudieron procesar:</p>
+          <ul class="list-disc list-inside mt-1">
+            <li v-for="(w, i) in uploadWarnings" :key="i">{{ w }}</li>
+          </ul>
         </div>
 
         <!-- Table -->
@@ -350,6 +360,7 @@ const isDragging = ref(false);
 const isProcessing = ref(false);
 const processingStatus = ref("");
 const uploadError = ref("");
+const uploadWarnings = ref<string[]>([]);
 const records = ref<Persona[]>([]);
 
 // Hard requirement to land in the CSV: nombre + centro. Rows missing either
@@ -404,6 +415,7 @@ function resetUpload() {
 function resetAll() {
   resetUpload();
   records.value = [];
+  uploadWarnings.value = [];
   step.value = "upload";
 }
 
@@ -411,16 +423,18 @@ async function processImages() {
   if (selectedFiles.value.length === 0) return;
   isProcessing.value = true;
   uploadError.value = "";
+  uploadWarnings.value = [];
 
   try {
     const n = selectedFiles.value.length;
     processingStatus.value =
       n === 1 ? "Leyendo imagen…" : `Procesando ${n} imágenes…`;
-    const result = await uploadAndProcess(
+    const { records: recs, errores } = await uploadAndProcess(
       selectedFiles.value,
       centroHint.value,
     );
-    records.value = result.map((r: Persona) => ({ ...r }));
+    records.value = recs.map((r) => ({ ...r }) as Persona);
+    uploadWarnings.value = errores ?? [];
     step.value = "review";
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Error desconocido";
@@ -454,7 +468,7 @@ function exportCSV() {
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const rows = exportableRows.value.map((r) =>
-    headers.map((h) => esc(r[h as keyof typeof r] ?? "")).join(","),
+    headers.map((h) => esc((r[h as keyof typeof r] as string) ?? "")).join(","),
   );
   const csv = [headers.join(","), ...rows].join("\n");
 

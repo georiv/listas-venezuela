@@ -16,5 +16,8 @@ frontend/dist/
 .env.*
 !.env.example
 
+# Local-only deploy notes
+DEPLOY.md
+
 # OS / editor
 .DS_Store

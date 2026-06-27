@@ -1,15 +1,13 @@
-"""Smoke tests for the API wiring — run without real API keys.
+"""Smoke tests for the API wiring — run without a real API key.
 
-These verify routing, validation and error handling without hitting
-Google Vision, Claude or Supabase.
+These verify routing, validation and error handling without hitting Gemini.
+The app is stateless: no database, no storage.
 """
 import io
 import os
 
 # Dummy env so module-level os.environ reads don't crash on import.
 os.environ.setdefault("GEMINI_API_KEY", "dummy")
-os.environ.setdefault("SUPABASE_URL", "https://dummy.supabase.co")
-os.environ.setdefault("SUPABASE_SERVICE_KEY", "dummy")
 
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -26,8 +24,6 @@ def test_healthz():
 def test_routes_registered():
     paths = set(app.openapi()["paths"].keys())
     assert "/upload" in paths
-    assert "/records/search" in paths
-    assert "/records/{record_id}" in paths
 
 
 def test_upload_rejects_bad_mimetype():
@@ -38,8 +34,3 @@ def test_upload_rejects_bad_mimetype():
     )
     assert r.status_code == 415
     assert "válida" in r.json()["detail"].lower()
-
-
-def test_search_requires_min_length():
-    r = client.get("/records/search", params={"q": "a"})
-    assert r.status_code == 422

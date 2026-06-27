@@ -4,12 +4,10 @@ export function useOCR() {
   async function uploadAndProcess(
     files: File[],
     centroHint: string = '',
-  ): Promise<Record<string, string>[]> {
+  ): Promise<{ records: Record<string, string>[]; errores: string[] }> {
     const form = new FormData()
     for (const file of files) form.append('files', file)
     form.append('centro_hint', centroHint)
-    // No voluntario_id in the open MVP (no login). Add it back once
-    // Supabase Auth is wired up.
 
     const resp = await fetch(`${apiBase}/upload`, {
       method: 'POST',
@@ -22,7 +20,10 @@ export function useOCR() {
     }
 
     const data = await resp.json()
-    return data.records as Record<string, string>[]
+    return {
+      records: (data.records ?? []) as Record<string, string>[],
+      errores: (data.errores ?? []) as string[],
+    }
   }
 
   return { uploadAndProcess }

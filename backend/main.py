@@ -8,10 +8,17 @@ load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
-from backend.routers import ocr, records
+from backend.ratelimit import limiter
+from backend.routers import ocr
 
 app = FastAPI(title="Listas Venezuela API", version="0.1.0")
+
+# Rate limiting (protects the paid /upload endpoint from abuse).
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Comma-separated list of allowed origins, e.g.
 #   FRONTEND_ORIGIN="https://listas-venezuela.vercel.app,http://localhost:3000"
@@ -30,7 +37,6 @@ app.add_middleware(
 )
 
 app.include_router(ocr.router)
-app.include_router(records.router)
 
 
 @app.get("/healthz")
