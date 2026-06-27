@@ -1,3 +1,7 @@
-# Root requirements so Railway/Nixpacks detects a Python app and installs deps.
-# The actual dependency list lives in backend/requirements.txt.
--r backend/requirements.txt
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+google-genai>=0.3.0
+python-multipart>=0.0.9
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+slowapi>=0.1.9

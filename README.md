@@ -54,7 +54,7 @@ cp .env.example .env        # y completa GEMINI_API_KEY
 
 # 2. Backend
 python3 -m venv backend/.venv
-backend/.venv/bin/pip install -r backend/requirements.txt
+backend/.venv/bin/pip install -r requirements.txt
 backend/.venv/bin/python -m uvicorn backend.main:app --reload   # http://localhost:8000
 
 # 3. Frontend
