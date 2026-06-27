@@ -65,11 +65,6 @@ backend/.venv/bin/python -m uvicorn backend.main:app --reload   # http://localho
 cd frontend && npm install && npm run dev                        # http://localhost:3000
 ```
 
-## Despliegue
-
-Backend en Railway y frontend en Vercel. Pasos detallados en
-[`DEPLOY.md`](DEPLOY.md).
-
 ## Licencia
 
 [MIT](LICENSE) — libre para usar, modificar y desplegar.
